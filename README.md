@@ -1,3 +1,3 @@
-##Meine JS-Übungen
+Meine JS-Übungen
 
 Kleine Aufgaben zum Üben.
