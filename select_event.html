@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Селект</title>
+    <script src="https://cdn.polyfill.io/v1/polyfill.js?features=CustomEvent,Element.prototype.closest"></script>
+    <style>
+        .customselect {
+            width: 200px;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .customselect .title {
+            height: 20px;
+            border: 2px groove #ADD8E6;
+            background: white;
+            width: 200px;
+            box-sizing: border-box;
+            padding: 2px;
+            line-height: 14px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .customselect li {
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        .customselect li:nth-child(even) {
+            background-color: #f0f8ff;
+        }
+
+        .customselect li:hover {
+            background-color: #7fffd4;
+        }
+
+        .customselect ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            background: white;
+            width: 200px;
+            border-bottom: 1px solid #add8e6;
+            border-left: 1px solid #add8e6;
+            border-right: 1px solid #add8e6;
+            box-sizing: border-box;
+        }
+
+        .customselect.open ul {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+<div>Das letzte Ergebnis: <span id="result">...</span></div>
+
+<div id="animal-select" class="customselect">
+    <button class="title">Auswählen</button>
+    <ul>
+        <li data-value="bird">Vögel</li>
+        <li data-value="fish">Fische</li>
+        <li data-value="animal">Tiere</li>
+        <li data-value="dino">Dinosaurier</li>
+        <li data-value="simplest">Einzeller</li>
+    </ul>
+</div>
+
+<div id="food-select" class="customselect">
+    <button class="title">Auswählen</button>
+    <ul>
+        <li data-value="carnivore">Fleischfressende</li>
+        <li data-value="herbivore">Grasfressende</li>
+        <li data-value="omnivore">Omnivore</li>
+    </ul>
+</div>
+
+
+<script>
+    var animalSelect = new CustomSelect({
+        elem: document.getElementById('animal-select')
+    });
+
+    var foodSelect = new CustomSelect({
+        elem: document.getElementById('food-select')
+    });
+
+    document.addEventListener('select', function(event) {
+        document.getElementById('result').innerHTML = event.detail.value;
+    });
+
+
+    function CustomSelect(options) {
+        var elem = options.elem;
+
+        elem.onclick = function(event) {
+            if (event.target.className == 'title') {
+                toggle();
+            } else if (event.target.tagName == 'LI') {
+                setValue(event.target.innerHTML, event.target.dataset.value);
+                close();
+            }
+        };
+
+        var isOpen = false;
+
+        function onDocumentClick(event) {
+            if (!elem.contains(event.target)) close();
+        }
+
+        function setValue(title, value) {
+            elem.querySelector('.title').innerHTML = title;
+
+            var widgetEvent = new CustomEvent('select', {
+                bubbles: true,
+                detail: {
+                    title: title,
+                    value: value
+                }
+            });
+
+            elem.dispatchEvent(widgetEvent);
+        }
+
+        function toggle() {
+            if (isOpen) close();
+            else open();
+        }
+
+        function open() {
+            elem.classList.add('open');
+            document.addEventListener('click', onDocumentClick);
+            isOpen = true;
+        }
+
+        function close() {
+            elem.classList.remove('open');
+            document.removeEventListener('click', onDocumentClick);
+            isOpen = false;
+        }
+
+    }
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        .selected {
+            background: #0f0;
+        }
+
+        li {
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://cdn.polyfill.io/v1/polyfill.js?features=CustomEvent,Element.prototype.closest"></script>
+</head>
+
+<body>
+
+Use:
+<br> Ctrl(Cmd)+Click
+<br> Shift+Click
+<br>
+
+<ul id="cities">
+    <li>Lübeck</li>
+    <li>Hamburg</li>
+    <li>München</li>
+    <li>Berlin</li>
+    <li>Leipzig</li>
+</ul>
+
+<script>
+    var listSelect = new ListSelect({
+        elem: document.querySelector('#cities')
+    });
+
+    document.querySelector('#cities').addEventListener('select', function(event) {
+        alert(event.detail);
+    });
+
+
+    function ListSelect(options) {
+        var elem = options.elem;
+
+        var lastClickedLi = null;
+
+        elem.onmousedown = function() {
+            return false;
+        };
+
+        elem.onclick = function(e) {
+            var li = e.target.closest('li');
+            if (!li) return;
+
+            if (e.metaKey || e.ctrlKey) {
+                toggleSelect(li);
+            } else if (e.shiftKey) {
+                selectFromLast(li);
+            } else {
+                selectSingle(li);
+            }
+
+            dispatchEvent();
+
+            lastClickedLi = li;
+        };
+
+        function deselectAll() {
+            [].forEach.call(elem.children, function(child) {
+                child.classList.remove('selected')
+            });
+        }
+
+        function toggleSelect(li) {
+            li.classList.toggle('selected');
+        }
+
+        function selectSingle(li) {
+            deselectAll();
+            li.classList.add('selected');
+        }
+
+        function selectFromLast(target) {
+            var startElem = lastClickedLi || elem.children[0];
+
+            target.classList.add('selected');
+            if (startElem == target) {
+                return;
+            }
+
+            var isLastClickedBefore = startElem.compareDocumentPosition(target) & 4;
+
+            if (isLastClickedBefore) {
+                for (var elem = startElem; elem != target; elem = elem.nextElementSibling) {
+                    elem.classList.add('selected');
+                }
+            } else {
+                for (var elem = startElem; elem != target; elem = elem.previousElementSibling) {
+                    elem.classList.add('selected');
+                }
+            }
+        }
+
+        function dispatchEvent() {
+            var widgetEvent = new CustomEvent("select", {
+                bubbles: true,
+                detail: getSelected()
+            });
+            elem.dispatchEvent(widgetEvent);
+        }
+
+        function getSelected() {
+            return [].map.call(elem.querySelectorAll('.selected'), function(li) {
+                return li.innerHTML;
+            });
+        };
+
+        this.getSelected = getSelected;
+    }
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        td select,
+        td input {
+            width: 150px;
+        }
+
+        #diagram td {
+            vertical-align: bottom;
+            text-align: center;
+            padding: 10px;
+        }
+
+        #diagram div {
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+
+Zinsrechner - 12% pro Jahr.
+<form name="calculator">
+    <table>
+        <tr>
+            <td>Summe</td>
+            <td>
+                <input name="money" type="text" value="10000">
+            </td>
+        </tr>
+        <tr>
+            <td>Monate</td>
+            <td>
+                <select name="months">
+                    <option value="3">3 (min)</option>
+                    <option value="6">6 (Halbesjahr)</option>
+                    <option value="12" selected>12 (1 Jahr)</option>
+                    <option value="18">18 (1.5 Jahre)</option>
+                    <option value="24">24 (2 Jahre)</option>
+                    <option value="30">30 (2.5 Jahre)</option>
+                    <option value="36">36 (3 Jahre)</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Mit Kapitalisierung</td>
+            <td>
+                <input name="capitalization" type="checkbox">
+            </td>
+        </tr>
+    </table>
+
+
+</form>
+
+
+<table id="diagram">
+    <tr>
+        <th>Anfang:</th>
+        <th>Ende:</th>
+    </tr>
+    <tr>
+        <th id="money-before"></th>
+        <th id="money-after"></th>
+    </tr>
+    <td>
+        <div style="background: red;width:40px;height:100px"></div>
+    </td>
+    <td>
+        <div style="background: green;width:40px;height:0" id="height-after"></div>
+    </td>
+</table>
+
+<script>
+    function getChar(event) {
+        if (event.which == null) {
+            if (event.keyCode < 32) return null;
+            return String.fromCharCode(event.keyCode)
+        }
+
+        if (event.which != 0 && event.charCode != 0) {
+            if (event.which < 32) return null;
+            return String.fromCharCode(event.which)
+        }
+        return null;
+    }
+
+    var form = document.forms.calculator;
+
+    var moneyElem = form.elements.money;
+    moneyElem.onkeypress = function(e) {
+        e = e || event;
+        var chr = getChar(e);
+
+        if (e.ctrlKey || e.altKey || chr == null) return;
+        if (chr < '0' || chr > '9') return false;
+    };
+
+    moneyElem.onkeyup = calculate;
+
+    moneyElem.oninput = calculate;
+
+    moneyElem.onpropertychange = function() {
+        event.propertyName == "value" && calculate();
+    };
+
+    var capitalizationElem = form.elements.capitalization;
+    capitalizationElem.onclick = calculate;
+
+    var monthsElem = form.elements.months;
+    monthsElem.onchange = calculate;
+
+
+    function calculate() {
+        var sum = +moneyElem.value;
+        if (!sum) return;
+
+        var monthlyIncrease = 0.01;
+
+        if (!capitalizationElem.checked) {
+            sum = sum * (1 + monthlyIncrease * monthsElem.value);
+        } else {
+
+            for (var i = 0; i < monthsElem.value; i++) {
+                sum = sum * (1 + monthlyIncrease);
+            }
+        }
+        sum = Math.round(sum);
+
+        var height = sum / moneyElem.value * 100 + 'px';
+        document.getElementById('height-after').style.height = height;
+        document.getElementById('money-before').innerHTML = moneyElem.value;
+        document.getElementById('money-after').innerHTML = sum;
+    }
+
+    calculate();
+</script>
+
+
+</body>
+
+</html>

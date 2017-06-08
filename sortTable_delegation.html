@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        th {
+            cursor: pointer;
+        }
+
+        th:hover {
+            background: yellow;
+        }
+    </style>
+</head>
+
+<body>
+
+<table id="grid">
+    <thead>
+    <tr>
+        <th data-type="number">Alter</th>
+        <th data-type="string">Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>5</td>
+        <td>Michael</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Jürgen</td>
+    </tr>
+    <tr>
+        <td>12</td>
+        <td>Janine</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>Anna</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Martin</td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    var grid = document.getElementById('grid');
+
+    grid.onclick = function(e) {
+        if (e.target.tagName != 'TH') return;
+
+        sortGrid(e.target.cellIndex, e.target.getAttribute('data-type'));
+    };
+
+    function sortGrid(colNum, type) {
+        var tbody = grid.getElementsByTagName('tbody')[0];
+
+        var rowsArray = [].slice.call(tbody.rows);
+        var compare;
+
+        switch (type) {
+            case 'number':
+                compare = function(rowA, rowB) {
+                    return rowA.cells[colNum].innerHTML - rowB.cells[colNum].innerHTML;
+                };
+                break;
+            case 'string':
+                compare = function(rowA, rowB) {
+                    return rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML ? 1 : -1;
+                };
+                break;
+        }
+
+        rowsArray.sort(compare);
+
+        grid.removeChild(tbody);
+
+        for (var i = 0; i < rowsArray.length; i++) {
+            tbody.appendChild(rowsArray[i]);
+        }
+
+        grid.appendChild(tbody);
+
+    }
+</script>
+
+</body>
+
+</html>

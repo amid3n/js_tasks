@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        .tree li {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<ul class="tree" id="tree">
+    <li>Real
+        <ul>
+            <li>Defenders
+                <ul>
+                    <li>Ramos</li>
+                    <li>Varan</li>
+                    <li>Pepe</li>
+                    <li>Carlos</li>
+                </ul>
+            </li>
+            <li>Strikers
+                <ul>
+                    <li>Ronaldo</li>
+                    <li>Bale</li>
+                    <li>Benzema</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>Bayern
+        <ul>
+            <li>Defenders
+                <ul>
+                    <li>Lahm</li>
+                    <li>Boateng</li>
+                </ul>
+
+            </li>
+            <li>Strikers
+                <ul>
+                    <li>Lewandowski</li>
+                    <li>Ribery</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<script>
+    var tree = document.getElementById('tree');
+
+    function isOverTitle(evt, li) {
+        var titleWrapper = document.createElement('span');
+        var titleTextNode = li.firstChild;
+        li.insertBefore(titleWrapper, titleTextNode);
+        titleWrapper.appendChild(titleTextNode);
+
+        var isClickOnTitle = (document.elementFromPoint(evt.clientX, evt.clientY) == titleWrapper);
+
+        titleWrapper.removeChild(titleWrapper.firstChild);
+        li.replaceChild(titleTextNode, titleWrapper);
+
+        return isClickOnTitle;
+    }
+
+    tree.onclick = function(evt) {
+        var evt = evt || event;
+        var target = evt.target || evt.srcElement;
+
+
+        if (!isOverTitle(evt, target)) {
+            return;
+        }
+
+        var node = target.getElementsByTagName('ul')[0];
+        if (!node) return;
+
+        node.style.display = node.style.display ? '' : 'none';
+    }
+</script>
+
+</body>
+
+</html>
